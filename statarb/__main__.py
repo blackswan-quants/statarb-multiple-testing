@@ -1,7 +1,7 @@
 """``python -m statarb``: rebuild every processed table from the raw files, in order.
 
-``--download`` also refetches the sources (index file, Tiingo list and prices, WIKI, sp500-data, FRED,
-French); without it only the local steps run.
+``--download`` also refetches the index file, the Tiingo ticker list, WIKI, sp500-data, FRED and French.
+Tiingo prices have their own resumable command: ``python -m statarb.tiingo prices``.
 """
 
 from __future__ import annotations

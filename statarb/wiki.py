@@ -9,18 +9,13 @@ import pandas as pd
 from dotenv import load_dotenv
 
 from statarb.config import DATA, ROOT, START, setup_logging
-from statarb.io import load, record_raw, save
+from statarb.io import record_raw, save
 
 log = logging.getLogger(__name__)
 
 HANDLE = "marketneutral/quandl-wiki-prices-us-equites"
 URL = f"https://www.kaggle.com/datasets/{HANDLE}"
 COLUMNS = ["ticker", "date", "open", "high", "low", "close", "volume", "ex-dividend", "split_ratio"]
-
-
-def to_wiki(ticker: str) -> str:
-    """Map an index symbol to WIKI's convention (share classes use '_': BRK.B -> BRK_B)."""
-    return ticker.replace(".", "_")
 
 
 def download() -> pd.DataFrame:
@@ -49,22 +44,12 @@ def download() -> pd.DataFrame:
 
 
 def main() -> None:
-    """Save WIKI prices from 2006 and log how many index stays they cover."""
+    """Save WIKI prices from 2006 to ``data/interim/wiki_prices.parquet``."""
     setup_logging()
     wiki = download()
     save(wiki, "wiki_prices", stage="interim")
-    span = wiki.groupby("ticker")["date"].agg(first="min", last="max")
-    cov = load("tiingo_coverage", stage="interim").assign(wiki=lambda d: d["ticker"].map(to_wiki))
-    cov = cov.join(span, on="wiki")
-    open_ = cov[cov["status"] != "ok"]
-    log.info(
-        "WIKI: %d tickers, %s -> %s; open Tiingo stays with a WIKI series: %d of %d",
-        len(span),
-        wiki["date"].min().date(),
-        wiki["date"].max().date(),
-        open_["first"].notna().sum(),
-        len(open_),
-    )
+    first, last = wiki["date"].min().date(), wiki["date"].max().date()
+    log.info("WIKI: %d tickers, %s -> %s", wiki["ticker"].nunique(), first, last)
 
 
 if __name__ == "__main__":
