@@ -9,7 +9,7 @@ import pandas as pd
 import pandas_market_calendars as mcal
 import requests
 
-from statarb.config import END, START, setup_logging
+from statarb.config import END, ROOT, START, setup_logging
 from statarb.errors import DataFetchError
 from statarb.io import save, save_raw
 
@@ -88,11 +88,34 @@ def membership_intervals(membership: pd.DataFrame, days: pd.DatetimeIndex) -> pd
     return out.reset_index()[["ticker", "start", "end"]]
 
 
+def apply_fixes(membership: pd.DataFrame, days: pd.DatetimeIndex, fixes: pd.DataFrame) -> pd.DataFrame:
+    """Add or remove hand-checked (ticker, start..end) spans from ``reference/membership_fixes.csv``.
+
+    Notes
+    -----
+    The index file dropped the ``-YYYYMM`` suffix of dead companies, so where an old and a new company
+    shared a symbol on the same day one of them vanished (e.g. old Allergan vs Watson/Actavis, both AGN).
+    The suffixed label is added back; it matches the label used by sp500-data.
+    """
+    m = membership
+    for ticker, start, end, action in zip(
+        fixes["ticker"], fixes["start"], fixes["end"], fixes["action"], strict=True
+    ):
+        span = days[(days >= start) & (days <= end)]
+        if action == "add":
+            m = pd.concat([m, pd.DataFrame({"date": span, "ticker": ticker})])
+        else:
+            m = m[~((m["ticker"] == ticker) & m["date"].isin(span))]
+    assert not m.duplicated(["date", "ticker"]).any(), "a fix adds a name that is already there"
+    return m.sort_values(["date", "ticker"]).reset_index(drop=True)
+
+
 def main() -> None:
     """Build and save membership and intervals for the project window."""
     setup_logging()
     days = trading_days()
-    membership = build_membership(fetch_snapshots(), days)
+    fixes = pd.read_csv(ROOT / "reference" / "membership_fixes.csv", parse_dates=["start", "end"])
+    membership = apply_fixes(build_membership(fetch_snapshots(), days), days, fixes)
     intervals = membership_intervals(membership, days)
     save(membership, "membership")
     save(intervals, "membership_intervals")

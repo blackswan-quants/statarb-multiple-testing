@@ -14,7 +14,7 @@ import requests
 
 from statarb.config import DATA, END, HISTORY_DAYS, START, setup_logging
 from statarb.errors import DataFetchError
-from statarb.io import save, save_raw
+from statarb.io import load, save, save_raw
 
 log = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ def _get(name: str) -> pd.DataFrame:
     return pd.read_parquet(io.BytesIO(resp.content))
 
 
-def download() -> pd.DataFrame:
+def download(index_tickers: set[str]) -> pd.DataFrame:
     """Download the release and keep prices from `HISTORY_DAYS` before each label's index entry to its exit.
 
     Returns
@@ -53,6 +53,7 @@ def download() -> pd.DataFrame:
     -----
     Membership spans are [start, end). Cutting to them (plus the pre-entry history) avoids picking up a
     recycled symbol's other company; when two labels share a base ticker on a day, the member one wins.
+    Suffixed labels that are themselves index tickers (added back in `statarb.universe`) are kept as is.
     ``close`` is as the source stores it: as traded for CRSP, Tiingo and WIKI, split-adjusted for Yahoo,
     so returns must be built per source (CRSP rows only have ``close``).
     """
@@ -63,7 +64,8 @@ def download() -> pd.DataFrame:
     first = x["start"] - pd.Timedelta(days=HISTORY_DAYS)
     x = x[(x["date"] >= first) & (x["end"].isna() | (x["date"] < x["end"]))]
     x["member"] = x["date"] >= x["start"]
-    x.insert(1, "ticker", x["label"].str.replace(r"-\d{6}$", "", regex=True))
+    base = x["label"].str.replace(r"-\d{6}$", "", regex=True)
+    x.insert(1, "ticker", base.where(~x["label"].isin(index_tickers), x["label"]))
     x = x.sort_values("member", ascending=False).drop_duplicates(["date", "ticker"])
     return (
         x.drop(columns=["start", "end", "adj_close"]).sort_values(["ticker", "date"]).reset_index(drop=True)
@@ -73,7 +75,7 @@ def download() -> pd.DataFrame:
 def main() -> None:
     """Save member-day prices to ``data/interim/sp500data_prices.parquet``."""
     setup_logging()
-    df = download()
+    df = download(set(load("membership")["ticker"]))
     save(df, "sp500data_prices", stage="interim")
     log.info("rows by source:\n%s", df["source"].value_counts().to_string())
 

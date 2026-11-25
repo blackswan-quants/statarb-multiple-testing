@@ -52,3 +52,11 @@ WFT,2006-01-03,2009-02-25,WFTIQ,,"manual: Weatherford, Tiingo files the old seri
 WLTW,2016-01-05,2022-01-07,WTW,,rename (auto-detected)
 WYND,2006-08-01,2018-05-30,TNL,WYN,manual: Wyndham Worldwide WYN -> WYND 2018 -> TNL 2021
 PSKY,2025-08-08,2025-12-31,SKYD,,manual: Paramount Skydance; Tiingo series SKYD starts 2025-08-06 (merger close)
+GAS,2006-01-03,2011-12-09,-,-,manual: Nicor; WIKI/Tiingo GAS is AGL Resources (price 35.66 vs 41.08 on 2006-01-03)
+PLD,2006-01-03,2011-06-02,-,-,manual: old ProLogis; WIKI/Tiingo PLD is AMB Property (legal acquirer in 2011)
+LSI,2006-01-03,2014-05-06,-,-,manual: LSI Corp; WIKI/Tiingo LSI is Life Storage (Sovran)
+MIL,2006-01-03,2010-07-14,-,-,manual: Millipore; WIKI MIL is another company (22.13 vs 67.38)
+WEN,2006-01-03,2008-09-29,-,-,manual: Wendy's International; WIKI/Tiingo WEN is Wendy's Co (Triarc lineage)
+KMG,2006-01-03,2006-08-10,-,-,manual: Kerr-McGee; WIKI/Tiingo KMG is KMG Chemicals
+CB,2006-01-03,2016-01-14,,ACE,manual: ACE Ltd; WIKI CB before 2016-01-15 is old Chubb and ACE is filed as ACE
+CB-201601,2006-01-03,2016-01-15,,CB,manual: old Chubb = WIKI CB up to 2016-01-14
