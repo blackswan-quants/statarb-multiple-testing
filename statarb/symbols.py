@@ -73,7 +73,7 @@ def segments(m: pd.DataFrame) -> pd.DataFrame:
     m = m.sort_values(["ticker", "date"])
     keys = m[["ticker", "tiingo", "wiki"]]
     new = (keys != keys.shift()).any(axis=1) | (m["date"].diff() > pd.Timedelta(days=7))
-    g = m.assign(any=m["in_tiingo"] | m["in_wiki"]).groupby(new.cumsum())
+    g = m.assign(any=m["in_tiingo"] | m["in_wiki"] | m["in_sp500data"]).groupby(new.cumsum())
     out = g.agg(
         ticker=("ticker", "first"),
         tiingo=("tiingo", "first"),
@@ -83,6 +83,7 @@ def segments(m: pd.DataFrame) -> pd.DataFrame:
         days=("date", "size"),
         tiingo_days=("in_tiingo", "sum"),
         wiki_days=("in_wiki", "sum"),
+        sp500data_days=("in_sp500data", "sum"),
         any_days=("any", "sum"),
     )
     return out.assign(missing=out["days"] - out["any_days"]).reset_index(drop=True)
@@ -99,15 +100,19 @@ def main() -> None:
     m = map_symbols(load("membership"), load_overrides())
     m["in_tiingo"] = covered(m, tiingo_spans, "tiingo")
     m["in_wiki"] = covered(m, wiki_spans.reset_index(), "wiki")
+    # sp500-data uses the index file's symbols and is already cut to member days: match on (date, ticker)
+    sp = load("sp500data_prices", stage="interim")[["date", "ticker"]].drop_duplicates().assign(hit=True)
+    m["in_sp500data"] = m.merge(sp, on=["date", "ticker"], how="left")["hit"].notna().to_numpy()
     seg = segments(m)
     save(m, "membership_symbols", stage="interim")
     save(seg, "symbol_coverage", stage="interim")
+    any_ = m["in_tiingo"] | m["in_wiki"] | m["in_sp500data"]
     log.info(
-        "stock-days %d: Tiingo %.2f%%, WIKI %.2f%%, either %.2f%%; missing %d in %d segments",
+        "stock-days %d: Tiingo %.2f%%, +WIKI %.2f%%, +sp500-data %.2f%%; missing %d in %d segments",
         len(m),
         100 * m["in_tiingo"].mean(),
-        100 * m["in_wiki"].mean(),
         100 * (m["in_tiingo"] | m["in_wiki"]).mean(),
+        100 * any_.mean(),
         seg["missing"].sum(),
         (seg["missing"] > 0).sum(),
     )
