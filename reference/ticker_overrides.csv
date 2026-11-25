@@ -51,3 +51,4 @@ VIAV,2006-01-03,2013-12-20,JDSU,JDSU,"manual: JDS Uniphase, renamed Viavi 2015"
 WFT,2006-01-03,2009-02-25,WFTIQ,,"manual: Weatherford, Tiingo files the old series as WFTIQ"
 WLTW,2016-01-05,2022-01-07,WTW,,rename (auto-detected)
 WYND,2006-08-01,2018-05-30,TNL,WYN,manual: Wyndham Worldwide WYN -> WYND 2018 -> TNL 2021
+PSKY,2025-08-08,2025-12-31,SKYD,,manual: Paramount Skydance; Tiingo series SKYD starts 2025-08-06 (merger close)
