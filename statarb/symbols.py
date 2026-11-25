@@ -121,6 +121,8 @@ def main() -> None:
     """Build the symbol grid with per-source coverage flags and log coverage on index days."""
     setup_logging()
     sup = load("tiingo_supported", stage="interim")
+    # the API serves only the latest series of a reused symbol (PARA = Parabolic, not Paramount)
+    sup = sup.sort_values(["endDate", "startDate"]).drop_duplicates("ticker", keep="last")
     tiingo_spans = sup.rename(columns={"ticker": "symbol", "startDate": "first", "endDate": "last"})
     wiki = load("wiki_prices", stage="interim")
     wiki_spans = wiki.groupby("ticker")["date"].agg(first="min", last="max").rename_axis("symbol")
