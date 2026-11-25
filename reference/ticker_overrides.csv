@@ -48,6 +48,7 @@ LSI,2006-01-03,2014-05-06,-,-,manual: LSI Corp; WIKI/Tiingo LSI is Life Storage 
 MIL,2006-01-03,2010-07-14,-,-,manual: Millipore; WIKI MIL is another company (22.13 vs 67.38)
 MMC,2006-01-03,2025-12-31,MRSH,,manual: Marsh McLennan MMC -> MRSH (2026)
 NLOK,2019-11-05,2022-11-07,GEN,,rename (auto-detected)
+PARA,2022-02-17,2025-08-07,PARAA,,"manual: Paramount Global class B; Tiingo PARA is Parabolic, proxy = PARAA (class A)"
 PEAK,2019-11-05,2024-03-01,DOC,,rename (auto-detected)
 PKI,2006-01-03,2023-05-15,RVTY,,rename (auto-detected)
 PLD,2006-01-03,2011-06-02,-,-,manual: old ProLogis; WIKI/Tiingo PLD is AMB Property (legal acquirer in 2011)
@@ -61,7 +62,7 @@ SYMC,2006-01-03,2019-11-04,GEN,,manual: Symantec -> NortonLifeLock 2019 -> Gen D
 TMK,2006-01-03,2019-08-07,GL,,manual: Torchmark -> Globe Life 2019
 TT,2006-01-03,2008-06-05,-,,"manual: Trane Inc (ex American Standard), not on Tiingo; Tiingo TT is Ingersoll-Rand"
 UTX,2006-01-03,2020-04-02,RTX,,manual: United Technologies -> Raytheon Technologies 2020
-VIAC,2019-12-05,2022-02-16,PARA,,rename (auto-detected)
+VIAC,2019-12-05,2022-02-16,PARAA,,"manual: ViacomCBS class B; proxy = Tiingo PARAA (class A, same company), class B series not served"
 VIAV,2006-01-03,2013-12-20,JDSU,JDSU,"manual: JDS Uniphase, renamed Viavi 2015"
 WEN,2006-01-03,2008-09-29,-,-,manual: Wendy's International; WIKI/Tiingo WEN is Wendy's Co (Triarc lineage)
 WFT,2006-01-03,2009-02-25,WFTIQ,,"manual: Weatherford, Tiingo files the old series as WFTIQ"

@@ -16,7 +16,16 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["ipykernel", "mypy", "pandas-stubs", "pre-commit", "pytest", "ruff", "types-requests"]
+dev = [
+    "ipykernel",
+    "mypy",
+    "nbconvert>=7.17.2",
+    "pandas-stubs",
+    "pre-commit",
+    "pytest",
+    "ruff",
+    "types-requests",
+]
 
 [build-system]
 requires = ["hatchling"]

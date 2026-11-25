@@ -35,5 +35,7 @@ Strong recommendations, not hard rules.
 ## Commands
 ```
 uv sync
+uv run python -m statarb               # rebuild processed tables from raw files (add --download to refetch)
+uv run jupyter nbconvert --to notebook --execute --inplace notebooks/01_data_qa.ipynb
 uv run ruff check . && uv run ruff format --check . && uv run mypy statarb && uv run pytest
 ```
