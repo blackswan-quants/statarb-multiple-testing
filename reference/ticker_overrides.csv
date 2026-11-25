@@ -1,0 +1,35 @@
+ticker,start,tiingo,note
+ABC,2006-01-03,COR,auto: rename
+ADS,2013-12-23,BFH,manual: Alliance Data -> Bread Financial 2022
+ANTM,2006-01-03,ELV,auto: rename
+ARNC,2006-01-03,HWM,auto: rename
+BHGE,2006-01-03,BKR,manual: Baker Hughes; Tiingo BKR starts 2017-07 (earlier years from WIKI)
+BK,2006-01-03,BNY,manual: BNY Mellon renamed BK -> BNY (2026)
+BLL,2006-01-03,BALL,auto: rename
+CDAY,2021-09-20,DAY,auto: rename
+COG,2008-06-23,CTRA,auto: rename
+CTL,2006-01-03,LUMN,manual: CenturyLink -> Lumen 2020
+DISCA,2010-03-01,WBD,auto: rename
+DWDP,2017-09-01,DD,manual: DowDuPont -> DuPont 2019
+FB,2013-12-23,META,auto: rename
+FBHS,2016-06-24,FBIN,manual: Fortune Brands -> FBIN 2022
+FI,2023-06-07,FISV,auto: rename
+FLT,2018-06-20,CPAY,auto: rename
+FRC,2019-01-02,FRCB,manual: bank failure 2023-05-01; Tiingo files it as FRCB (pink)
+GPS,2006-01-03,GAP,manual: Gap GPS -> GAP 2024
+HCP,2008-03-31,DOC,manual: HCP -> PEAK 2019 -> DOC 2024
+HFC,2018-06-18,DINO,manual: HollyFrontier -> HF Sinclair 2022
+HRS,2008-09-22,LHX,manual: Harris -> L3Harris 2019
+JEC,2007-10-26,J,auto: rename
+LB,2006-01-03,BBWI,auto: rename
+MMC,2006-01-03,MRSH,manual: Marsh McLennan MMC -> MRSH (2026)
+NLOK,2019-11-05,GEN,auto: rename
+PEAK,2019-11-05,DOC,auto: rename
+PKI,2006-01-03,RVTY,auto: rename
+RE,2017-06-19,EG,auto: rename
+SIVB,2018-03-19,SIVBQ,manual: SVB failure 2023-03-10; Tiingo files it as SIVBQ (pink)
+SYMC,2006-01-03,GEN,manual: Symantec -> NortonLifeLock 2019 -> Gen Digital 2022
+TMK,2006-01-03,GL,manual: Torchmark -> Globe Life 2019
+UTX,2006-01-03,RTX,manual: United Technologies -> Raytheon Technologies 2020
+VIAC,2019-12-05,PARA,auto: rename
+WLTW,2016-01-05,WTW,auto: rename
