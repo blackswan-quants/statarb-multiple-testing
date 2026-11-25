@@ -24,3 +24,15 @@ FetchContent_MakeAvailable(eigen)
 add_library(eigen_headers INTERFACE)
 target_include_directories(eigen_headers SYSTEM INTERFACE ${eigen_SOURCE_DIR})
 add_library(Eigen3::Eigen ALIAS eigen_headers)
+
+# --- Engine library ---------------------------------------------------------
+add_library(engine engine/src/ols.cpp)
+target_include_directories(engine PUBLIC engine/include)
+target_link_libraries(engine PUBLIC Eigen3::Eigen)
+
+# Strict warnings on our own code
+if(MSVC)
+  target_compile_options(engine PRIVATE /W4)
+else()
+  target_compile_options(engine PRIVATE -Wall -Wextra -Wpedantic)
+endif()
