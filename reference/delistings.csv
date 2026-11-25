@@ -1,0 +1,3 @@
+ticker,date,ret,note
+SIVB,2023-03-10,-0.996228,SVB halted 2023-03-10 and seized; first OTC trade 2023-03-28 at 0.40 vs last close 106.04 (Tiingo SIVBQ)
+SBNY,2023-03-13,-0.998143,Signature Bank seized 2023-03-12; first OTC trade 2023-03-28 at 0.13 vs last close 70.00 (Tiingo SBNY)
