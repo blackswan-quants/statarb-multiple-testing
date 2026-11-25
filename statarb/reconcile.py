@@ -96,20 +96,14 @@ def assemble(grid: pd.DataFrame, *sources: pd.DataFrame) -> pd.DataFrame:
     return out.sort_values(["ticker", "date"]).reset_index(drop=True)
 
 
-def main() -> None:
-    """Build ``prices.parquet`` (WIKI > sp500-data until Tiingo is downloaded) and the WIKI cross-check."""
-    setup_logging()
-    grid = load("universe_symbols", stage="interim")
-    wiki = wiki_rows(grid, load("wiki_prices", stage="interim"))
-    sp = sp500data_rows(grid, load("sp500data_prices", stage="interim"))
-    wiki["ret"], sp["ret"] = total_return(wiki), total_return(sp)
-
-    other = sp[sp["source"] != "sp500data:wiki"]  # their WIKI rows are the same file
-    summary, flagged = compare(wiki, other)
-    save(summary.reset_index(), "recon_wiki_vs_sp500data", stage="interim")
-    save(flagged, "recon_wiki_vs_sp500data_flagged", stage="interim")
+def check(name: str, a: pd.DataFrame, b: pd.DataFrame) -> None:
+    """Run `compare`, save summary and flagged days as ``recon_<name>`` and log the headline numbers."""
+    summary, flagged = compare(a, b)
+    save(summary.reset_index(), f"recon_{name}", stage="interim")
+    save(flagged, f"recon_{name}_flagged", stage="interim")
     log.info(
-        "WIKI vs sp500-data: %d tickers, %d common days, median corr %.4f, %d days over %.0f%% in %d tickers",
+        "%s: %d tickers, %d common days, median corr %.4f, %d days over %.0f%% in %d tickers",
+        name,
         len(summary),
         summary["days"].sum(),
         summary["corr"].median(),
@@ -118,7 +112,24 @@ def main() -> None:
         (summary["days_over"] > 0).sum(),
     )
 
-    prices = assemble(grid, wiki, sp)
+
+def main() -> None:
+    """Build ``prices.parquet`` (Tiingo > WIKI > sp500-data) and the cross-source checks."""
+    setup_logging()
+    grid = load("universe_symbols", stage="interim")
+    tp = load("tiingo_prices", stage="interim").rename(columns={"symbol": "tiingo"})
+    tiingo = grid[["date", "ticker", "tiingo"]].merge(tp, on=["date", "tiingo"])
+    tiingo = tiingo.rename(columns={"tiingo": "symbol"}).assign(source="tiingo")[COLS]
+    wiki = wiki_rows(grid, load("wiki_prices", stage="interim"))
+    sp = sp500data_rows(grid, load("sp500data_prices", stage="interim"))
+    for df in (tiingo, wiki, sp):
+        df["ret"] = total_return(df)
+
+    check("tiingo_vs_wiki", tiingo, wiki)
+    check("tiingo_vs_sp500data", tiingo, sp[~sp["source"].str.startswith("sp500data:tiingo")])
+    check("wiki_vs_sp500data", wiki, sp[sp["source"] != "sp500data:wiki"])  # their WIKI rows are this file
+
+    prices = assemble(grid, tiingo, wiki, sp)
     save(prices, "prices")
     idx = prices[prices["in_index"]]
     log.info("index days by source:\n%s", idx["source"].value_counts().to_string())
