@@ -1,0 +1,36 @@
+[project]
+name = "statarb"
+version = "0.1.0"
+description = "PCA stat arb with multiple-testing corrections"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "kagglehub",
+    "numpy",
+    "pandas",
+    "pyarrow",
+    "pydantic-settings",
+    "requests",
+    "rich",
+]
+
+[dependency-groups]
+dev = ["ipykernel", "mypy", "pandas-stubs", "pre-commit", "pytest", "ruff", "types-requests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "D"]
+ignore = ["D100", "D104", "D105", "D107"]
+pydocstyle.convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D"]
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
