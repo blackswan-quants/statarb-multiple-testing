@@ -983,6 +983,7 @@ dependencies = [
     { name = "pandas-market-calendars" },
     { name = "pyarrow" },
     { name = "pydantic-settings" },
+    { name = "python-dotenv" },
     { name = "requests" },
     { name = "rich" },
 ]
@@ -1006,6 +1007,7 @@ requires-dist = [
     { name = "pandas-market-calendars", specifier = ">=5.6.1" },
     { name = "pyarrow" },
     { name = "pydantic-settings" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
     { name = "requests" },
     { name = "rich" },
 ]

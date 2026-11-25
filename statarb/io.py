@@ -39,19 +39,29 @@ def save_raw(content: bytes, name: str, url: str) -> Path:
     path = DATA / "raw" / name
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(content)
+    record_raw(path, url)
+    return path
+
+
+def record_raw(path: Path, url: str) -> None:
+    """Append a manifest row for a file already written under ``data/raw`` (hashed in 1 MB chunks)."""
+    sha = hashlib.sha256()
+    with path.open("rb") as f:
+        while chunk := f.read(1 << 20):
+            sha.update(chunk)
+    size = path.stat().st_size
     row = pd.DataFrame(
         {
             "fetched_at": [datetime.now(UTC).isoformat(timespec="seconds")],
-            "file": [name],
+            "file": [path.relative_to(DATA / "raw").as_posix()],
             "url": [url],
-            "sha256": [hashlib.sha256(content).hexdigest()],
-            "bytes": [len(content)],
+            "sha256": [sha.hexdigest()],
+            "bytes": [size],
         }
     )
     manifest = DATA / "raw" / "manifest.csv"
     row.to_csv(manifest, mode="a", header=not manifest.exists(), index=False)
-    log.info("raw saved: %s (%.1f kB)", name, len(content) / 1e3)
-    return path
+    log.info("raw saved: %s (%.1f MB)", row["file"].iloc[0], size / 1e6)
 
 
 def save(df: pd.DataFrame, name: str, stage: str = "processed") -> Path:
