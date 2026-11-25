@@ -1,35 +1,53 @@
-ticker,start,tiingo,note
-ABC,2006-01-03,COR,auto: rename
-ADS,2013-12-23,BFH,manual: Alliance Data -> Bread Financial 2022
-ANTM,2006-01-03,ELV,auto: rename
-ARNC,2006-01-03,HWM,auto: rename
-BHGE,2006-01-03,BKR,manual: Baker Hughes; Tiingo BKR starts 2017-07 (earlier years from WIKI)
-BK,2006-01-03,BNY,manual: BNY Mellon renamed BK -> BNY (2026)
-BLL,2006-01-03,BALL,auto: rename
-CDAY,2021-09-20,DAY,auto: rename
-COG,2008-06-23,CTRA,auto: rename
-CTL,2006-01-03,LUMN,manual: CenturyLink -> Lumen 2020
-DISCA,2010-03-01,WBD,auto: rename
-DWDP,2017-09-01,DD,manual: DowDuPont -> DuPont 2019
-FB,2013-12-23,META,auto: rename
-FBHS,2016-06-24,FBIN,manual: Fortune Brands -> FBIN 2022
-FI,2023-06-07,FISV,auto: rename
-FLT,2018-06-20,CPAY,auto: rename
-FRC,2019-01-02,FRCB,manual: bank failure 2023-05-01; Tiingo files it as FRCB (pink)
-GPS,2006-01-03,GAP,manual: Gap GPS -> GAP 2024
-HCP,2008-03-31,DOC,manual: HCP -> PEAK 2019 -> DOC 2024
-HFC,2018-06-18,DINO,manual: HollyFrontier -> HF Sinclair 2022
-HRS,2008-09-22,LHX,manual: Harris -> L3Harris 2019
-JEC,2007-10-26,J,auto: rename
-LB,2006-01-03,BBWI,auto: rename
-MMC,2006-01-03,MRSH,manual: Marsh McLennan MMC -> MRSH (2026)
-NLOK,2019-11-05,GEN,auto: rename
-PEAK,2019-11-05,DOC,auto: rename
-PKI,2006-01-03,RVTY,auto: rename
-RE,2017-06-19,EG,auto: rename
-SIVB,2018-03-19,SIVBQ,manual: SVB failure 2023-03-10; Tiingo files it as SIVBQ (pink)
-SYMC,2006-01-03,GEN,manual: Symantec -> NortonLifeLock 2019 -> Gen Digital 2022
-TMK,2006-01-03,GL,manual: Torchmark -> Globe Life 2019
-UTX,2006-01-03,RTX,manual: United Technologies -> Raytheon Technologies 2020
-VIAC,2019-12-05,PARA,auto: rename
-WLTW,2016-01-05,WTW,auto: rename
+ticker,start,end,tiingo,wiki,note
+ABC,2006-01-03,2023-08-29,COR,,rename (auto-detected)
+ADS,2013-12-23,2020-06-19,BFH,,manual: Alliance Data -> Bread Financial 2022
+ANTM,2006-01-03,2022-06-27,ELV,,rename (auto-detected)
+ARNC,2006-01-03,2020-04-03,HWM,,rename (auto-detected)
+ATGE,2009-06-09,2012-09-28,,DV,"manual: DeVry (DV), renamed Adtalem 2017"
+BHGE,2006-01-03,2017-07-03,BHI,BHI,manual: Baker Hughes Inc (BHI) until the 2017 GE merger
+BHGE,2017-07-05,2019-10-17,BKR,,"manual: Baker Hughes a GE company, now BKR"
+BK,2006-01-03,2025-12-31,BNY,,manual: BNY Mellon renamed BK -> BNY (2026)
+BLL,2006-01-03,2022-05-09,BALL,,rename (auto-detected)
+BTUUQ,2006-11-20,2014-09-19,BTU,BTU,"manual: Peabody pre-bankruptcy; Tiingo BTU has two series, check API"
+CBS,2006-01-03,2019-12-04,VIAC,,"manual: CBS Corp; Tiingo files it as VIAC NYSE 2005-12..2019-12, check API"
+CDAY,2021-09-20,2024-01-31,DAY,,rename (auto-detected)
+COG,2008-06-23,2021-10-01,CTRA,,rename (auto-detected)
+CTL,2006-01-03,2020-09-17,LUMN,,manual: CenturyLink -> Lumen 2020
+DISCA,2010-03-01,2022-04-08,WBD,,rename (auto-detected)
+DWDP,2017-09-01,2019-05-31,DD,,manual: DowDuPont -> DuPont 2019
+DXC,2006-01-03,2015-11-30,CSC,CSC,manual: Computer Sciences (index file uses 2019 symbol)
+EQR,2006-01-03,2025-12-31,VMRK,,manual: Equity Residential renamed VMRK 2026 (Tiingo start 1993-08-12 = EQR IPO)
+FB,2013-12-23,2022-06-08,META,,rename (auto-detected)
+FBHS,2016-06-24,2022-12-16,FBIN,,manual: Fortune Brands -> FBIN 2022
+FI,2023-06-07,2025-11-10,FISV,,rename (auto-detected)
+FLT,2018-06-20,2024-03-22,CPAY,,rename (auto-detected)
+FOX,2015-09-21,2019-03-18,TFCF,,manual: 21st Century Fox class B until the 2019 Disney deal
+FOXA,2006-01-03,2019-03-18,TFCFA,,manual: News Corp / 21st Century Fox class A until 2019
+FRC,2019-01-02,2023-05-03,FRCB,,manual: bank failure 2023-05-01; Tiingo files it as FRCB (pink)
+GPS,2006-01-03,2022-02-01,GAP,,manual: Gap GPS -> GAP 2024
+HCP,2008-03-31,2019-11-04,DOC,,manual: HCP -> PEAK 2019 -> DOC 2024
+HFC,2018-06-18,2021-06-03,DINO,,manual: HollyFrontier -> HF Sinclair 2022
+HRS,2008-09-22,2019-05-31,LHX,,manual: Harris -> L3Harris 2019
+IAC,2006-12-01,2008-08-20,IACI,IACI,manual: IAC/InterActiveCorp traded as IACI
+IR,2006-01-03,2009-06-30,TT,,"manual: Ingersoll-Rand plc, renamed Trane Technologies (TT) 2020"
+IR,2010-11-17,2020-03-02,TT,,manual: Ingersoll-Rand plc until 2020-03-02; then IR = ex Gardner Denver
+JEC,2007-10-26,2019-12-09,J,,rename (auto-detected)
+KORS,2013-11-13,2018-09-18,CPRI,,manual: Michael Kors renamed Capri 2018
+LB,2006-01-03,2021-08-02,BBWI,,rename (auto-detected)
+MMC,2006-01-03,2025-12-31,MRSH,,manual: Marsh McLennan MMC -> MRSH (2026)
+NLOK,2019-11-05,2022-11-07,GEN,,rename (auto-detected)
+PEAK,2019-11-05,2024-03-01,DOC,,rename (auto-detected)
+PKI,2006-01-03,2023-05-15,RVTY,,rename (auto-detected)
+RE,2017-06-19,2023-07-07,EG,,rename (auto-detected)
+RSHCQ,2006-01-03,2011-06-30,RSH,RSH,manual: RadioShack
+SIVB,2018-03-19,2023-03-14,SIVBQ,,manual: SVB failure 2023-03-10; Tiingo files it as SIVBQ (pink)
+SUNEQ,2007-05-31,2011-12-16,SUNE,SUNE,"manual: MEMC Electronic (WFR), renamed SunEdison 2013"
+SYMC,2006-01-03,2019-11-04,GEN,,manual: Symantec -> NortonLifeLock 2019 -> Gen Digital 2022
+TMK,2006-01-03,2019-08-07,GL,,manual: Torchmark -> Globe Life 2019
+TT,2006-01-03,2008-06-05,-,,"manual: Trane Inc (ex American Standard), not on Tiingo; Tiingo TT is Ingersoll-Rand"
+UTX,2006-01-03,2020-04-02,RTX,,manual: United Technologies -> Raytheon Technologies 2020
+VIAC,2019-12-05,2022-02-16,PARA,,rename (auto-detected)
+VIAV,2006-01-03,2013-12-20,JDSU,JDSU,"manual: JDS Uniphase, renamed Viavi 2015"
+WFT,2006-01-03,2009-02-25,WFTIQ,,"manual: Weatherford, Tiingo files the old series as WFTIQ"
+WLTW,2016-01-05,2022-01-07,WTW,,rename (auto-detected)
+WYND,2006-08-01,2018-05-30,TNL,WYN,manual: Wyndham Worldwide WYN -> WYND 2018 -> TNL 2021
