@@ -12,7 +12,7 @@ import logging
 import pandas as pd
 import requests
 
-from statarb.config import END, START, setup_logging
+from statarb.config import DATA, END, HISTORY_DAYS, START, setup_logging
 from statarb.errors import DataFetchError
 from statarb.io import save, save_raw
 
@@ -23,6 +23,9 @@ URL = f"https://github.com/Johnbrick123/sp500-data/releases/download/{TAG}/{{}}"
 
 
 def _get(name: str) -> pd.DataFrame:
+    raw = DATA / "raw" / "sp500data" / TAG / name
+    if raw.exists():  # pinned release: the raw copy is the same file
+        return pd.read_parquet(raw)
     url = URL.format(name)
     resp = requests.get(url, timeout=600)
     if resp.status_code != 200:
@@ -32,13 +35,14 @@ def _get(name: str) -> pd.DataFrame:
 
 
 def download() -> pd.DataFrame:
-    """Download the release and keep prices on the days each label was an index member.
+    """Download the release and keep prices from `HISTORY_DAYS` before each label's index entry to its exit.
 
     Returns
     -------
     pd.DataFrame
-        ``date, ticker, label, open, high, low, close, volume, dividends, stock_splits, source`` where
-        ``ticker`` is the label without the ``-YYYYMM`` suffix the repo gives to dead companies.
+        ``date, ticker, label, open, high, low, close, volume, dividends, stock_splits, source, member``
+        where ``ticker`` is the label without the ``-YYYYMM`` suffix the repo gives to dead companies and
+        ``member`` flags days inside the label's index span.
 
     Raises
     ------
@@ -47,18 +51,23 @@ def download() -> pd.DataFrame:
 
     Notes
     -----
-    Membership spans are [start, end). Restricting to them avoids picking up a recycled symbol's later
-    company. ``close`` is as the source stores it: as traded for CRSP, Tiingo and WIKI, split-adjusted
-    for Yahoo, so returns must be built per source (CRSP rows only have ``close``).
+    Membership spans are [start, end). Cutting to them (plus the pre-entry history) avoids picking up a
+    recycled symbol's other company; when two labels share a base ticker on a day, the member one wins.
+    ``close`` is as the source stores it: as traded for CRSP, Tiingo and WIKI, split-adjusted for Yahoo,
+    so returns must be built per source (CRSP rows only have ``close``).
     """
     prices = _get("prices.parquet").rename(columns={"ticker": "label"})
     spans = _get("membership_intervals.parquet").rename(columns={"ticker": "label"})
     prices = prices[(prices["date"] >= START) & (prices["date"] <= END) & prices["close"].notna()]
     x = prices.merge(spans, on="label")
-    x = x[(x["date"] >= x["start"]) & (x["end"].isna() | (x["date"] < x["end"]))]
-    x = x.drop(columns=["start", "end", "adj_close"]).drop_duplicates(["date", "label"])
+    first = x["start"] - pd.Timedelta(days=HISTORY_DAYS)
+    x = x[(x["date"] >= first) & (x["end"].isna() | (x["date"] < x["end"]))]
+    x["member"] = x["date"] >= x["start"]
     x.insert(1, "ticker", x["label"].str.replace(r"-\d{6}$", "", regex=True))
-    return x.sort_values(["ticker", "date"]).reset_index(drop=True)
+    x = x.sort_values("member", ascending=False).drop_duplicates(["date", "ticker"])
+    return (
+        x.drop(columns=["start", "end", "adj_close"]).sort_values(["ticker", "date"]).reset_index(drop=True)
+    )
 
 
 def main() -> None:

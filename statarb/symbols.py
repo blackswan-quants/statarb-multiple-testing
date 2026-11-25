@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import logging
 
+import numpy as np
 import pandas as pd
 
-from statarb.config import ROOT, setup_logging
+from statarb.config import HISTORY_DAYS, ROOT, setup_logging
 from statarb.io import load, save
+from statarb.universe import trading_days
 
 log = logging.getLogger(__name__)
 
@@ -62,59 +64,85 @@ def covered(m: pd.DataFrame, spans: pd.DataFrame, col: str) -> pd.Series:
     return pd.Series(m.index.isin(inside), index=m.index)
 
 
-def segments(m: pd.DataFrame) -> pd.DataFrame:
-    """Collapse daily rows into runs with the same ticker and source symbols, with covered-day counts.
+def runs(m: pd.DataFrame, days: pd.DatetimeIndex) -> pd.DataFrame:
+    """Collapse daily membership rows into runs with the same ticker and source symbols.
 
     Notes
     -----
-    A new run starts when the ticker, either source symbol changes, or the gap from the previous row is more
-    than 7 calendar days (the stock left the index and came back).
+    A new run starts when the ticker or a source symbol changes, or a trading day is skipped (the stock
+    left the index and came back).
     """
     m = m.sort_values(["ticker", "date"])
     keys = m[["ticker", "tiingo", "wiki"]]
-    new = (keys != keys.shift()).any(axis=1) | (m["date"].diff() > pd.Timedelta(days=7))
-    g = m.assign(any=m["in_tiingo"] | m["in_wiki"] | m["in_sp500data"]).groupby(new.cumsum())
-    out = g.agg(
+    skip = np.diff(days.get_indexer(pd.DatetimeIndex(m["date"])), prepend=-1) != 1
+    new = (keys != keys.shift()).any(axis=1) | skip
+    out = m.groupby(new.cumsum()).agg(
         ticker=("ticker", "first"),
         tiingo=("tiingo", "first"),
         wiki=("wiki", "first"),
         start=("date", "min"),
         end=("date", "max"),
-        days=("date", "size"),
-        tiingo_days=("in_tiingo", "sum"),
-        wiki_days=("in_wiki", "sum"),
-        sp500data_days=("in_sp500data", "sum"),
-        any_days=("any", "sum"),
     )
-    return out.assign(missing=out["days"] - out["any_days"]).reset_index(drop=True)
+    return out.reset_index(drop=True).rename_axis("run").reset_index()
+
+
+def extend(runs: pd.DataFrame, days: pd.DatetimeIndex) -> pd.DataFrame:
+    """Expand runs to daily rows from `HISTORY_DAYS` before entry to exit, flagging the index days.
+
+    Parameters
+    ----------
+    runs : pd.DataFrame
+        Output of `runs`.
+    days : pd.DatetimeIndex
+        Trading days of the project window.
+
+    Returns
+    -------
+    pd.DataFrame
+        ``date, ticker, run, tiingo, wiki, in_index``: one row per (date, ticker).
+
+    Notes
+    -----
+    The pre-entry history feeds the rolling windows (sector R², PCA) on the first days in the index. Where a
+    history day overlaps another run of the same ticker, the run that is in the index that day wins.
+    """
+    i0 = days.searchsorted(runs["start"] - pd.Timedelta(days=HISTORY_DAYS))
+    i1 = days.searchsorted(runs["end"], side="right")
+    n = i1 - i0
+    pos = np.repeat(i0, n) + np.arange(n.sum()) - np.repeat(np.cumsum(n) - n, n)
+    g = runs.loc[runs.index.repeat(n)].reset_index(drop=True)
+    g.insert(0, "date", days[pos])
+    g["in_index"] = g["date"] >= g["start"]
+    g = g.sort_values("in_index", ascending=False).drop_duplicates(["date", "ticker"])
+    return g.drop(columns=["start", "end"]).sort_values(["ticker", "date"]).reset_index(drop=True)
 
 
 def main() -> None:
-    """Map symbols, flag coverage per day, save daily map and per-segment summary."""
+    """Build the symbol grid with per-source coverage flags and log coverage on index days."""
     setup_logging()
     sup = load("tiingo_supported", stage="interim")
     tiingo_spans = sup.rename(columns={"ticker": "symbol", "startDate": "first", "endDate": "last"})
     wiki = load("wiki_prices", stage="interim")
     wiki_spans = wiki.groupby("ticker")["date"].agg(first="min", last="max").rename_axis("symbol")
+    sp = load("sp500data_prices", stage="interim")[["date", "ticker"]].assign(hit=True)
 
-    m = map_symbols(load("membership"), load_overrides())
-    m["in_tiingo"] = covered(m, tiingo_spans, "tiingo")
-    m["in_wiki"] = covered(m, wiki_spans.reset_index(), "wiki")
-    # sp500-data uses the index file's symbols and is already cut to member days: match on (date, ticker)
-    sp = load("sp500data_prices", stage="interim")[["date", "ticker"]].drop_duplicates().assign(hit=True)
-    m["in_sp500data"] = m.merge(sp, on=["date", "ticker"], how="left")["hit"].notna().to_numpy()
-    seg = segments(m)
-    save(m, "membership_symbols", stage="interim")
-    save(seg, "symbol_coverage", stage="interim")
-    any_ = m["in_tiingo"] | m["in_wiki"] | m["in_sp500data"]
+    days = trading_days()
+    g = extend(runs(map_symbols(load("membership"), load_overrides()), days), days)
+    g["in_tiingo"] = covered(g, tiingo_spans, "tiingo")
+    g["in_wiki"] = covered(g, wiki_spans.reset_index(), "wiki")
+    g["in_sp500data"] = g.merge(sp, on=["date", "ticker"], how="left")["hit"].notna().to_numpy()
+    save(g, "universe_symbols", stage="interim")
+
+    idx = g[g["in_index"]]
+    any_ = idx["in_tiingo"] | idx["in_wiki"] | idx["in_sp500data"]
     log.info(
-        "stock-days %d: Tiingo %.2f%%, +WIKI %.2f%%, +sp500-data %.2f%%; missing %d in %d segments",
-        len(m),
-        100 * m["in_tiingo"].mean(),
-        100 * (m["in_tiingo"] | m["in_wiki"]).mean(),
+        "%d rows (%d index days): Tiingo %.2f%%, +WIKI %.2f%%, +sp500-data %.2f%%; %d index days missing",
+        len(g),
+        len(idx),
+        100 * idx["in_tiingo"].mean(),
+        100 * (idx["in_tiingo"] | idx["in_wiki"]).mean(),
         100 * any_.mean(),
-        seg["missing"].sum(),
-        (seg["missing"] > 0).sum(),
+        (~any_).sum(),
     )
 
 

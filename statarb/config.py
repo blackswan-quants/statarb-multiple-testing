@@ -11,6 +11,7 @@ from rich.logging import RichHandler
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 START, END = "2006-01-01", "2025-12-31"
+HISTORY_DAYS = 380  # calendar days of prices kept before index entry (~260 sessions for the 252-day windows)
 SECTOR_ETFS = ["XLB", "XLE", "XLF", "XLI", "XLK", "XLP", "XLU", "XLV", "XLY", "XLRE", "XLC"]
 ETFS = [*SECTOR_ETFS, "SPY"]
 
