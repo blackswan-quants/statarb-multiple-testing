@@ -140,3 +140,34 @@ def log_trial(
     (root / f"{trial_id}.json").write_text(json.dumps(record, indent=2, ensure_ascii=False) + "\n")
     log.info("Logged trial %s (%d days)", trial_id, len(pnl))
     return trial_id
+
+
+def load_index(root: Path = TRIALS) -> pd.DataFrame:
+    """Read every ``<trial_id>.json`` into one row per trial, sorted by time.
+
+    Nested fields become columns: ``config.window``, ``summary.sharpe_net``, ...
+    """
+    records = [json.loads(p.read_text()) for p in sorted(root.glob("*.json"))]
+    return pd.json_normalize(records)
+
+
+def load_matrix(kind: str = "net", root: Path = TRIALS) -> pd.DataFrame:
+    """Daily returns of every trial as a T x N matrix: dates as rows, ``trial_id`` as columns.
+
+    Parameters
+    ----------
+    kind : str
+        ``"net"`` or ``"gross"``.
+    root : Path
+        Folder of the log, ``trials/`` by default.
+
+    Returns
+    -------
+    pd.DataFrame
+        One column per trial in time order; NaN where a trial does not cover a date.
+    """
+    cols = {
+        p.stem: pd.read_parquet(p, columns=["date", f"pnl_{kind}"]).set_index("date")[f"pnl_{kind}"]
+        for p in sorted(root.glob("*.parquet"))
+    }
+    return pd.DataFrame(cols)
