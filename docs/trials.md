@@ -98,7 +98,8 @@ $$
 \hat\sigma_r = \sqrt{\frac{1}{T-1}\sum_{t=1}^{T}\left(r_t - \bar r\right)^2}.
 $$
 
-If $\hat\sigma_r = 0$ the Sharpe ratio is `null`.
+If $\hat\sigma_r$ is zero or undefined (fewer than two days) the Sharpe
+ratio is `null`.
 
 Maximum drawdown, on the compounded equity curve $V_t$ with $V_0 = 1$:
 
@@ -133,4 +134,60 @@ $$
 \texttt{config\_hash} = \operatorname{SHA\text{-}256}\big(\operatorname{utf8}(\operatorname{canonical\_json}(\texttt{config}))\big)
 $$
 
-Same config, same
+Same config, same hash. The hash identifies *what* was tried; `trial_id`
+identifies *each run*.
+
+## Reading the log
+
+- `load_index()`: one row per trial (metadata, config and summary expanded
+  into columns, e.g. `config.window`, `summary.sharpe_net`).
+- `load_matrix(kind="net" | "gross")`: $T \times N$ matrix of daily returns,
+  dates as rows, `trial_id` as columns.
+
+Further views (e.g. a local SQLite file for queries) are built from these
+files and are not committed.
+
+## Test runs
+
+Runs that only check the infrastructure (not attempts at the strategy) set
+`"kind": "dummy"` in their config:
+
+```json
+{"kind": "dummy", "note": "end-to-end check of the trial logger", "seed": 0}
+```
+
+They stay in the log like every other run, but analyses that count trials
+(N, DSR, PBO) exclude them explicitly:
+
+```python
+index = load_index()
+trials = index[index["config.kind"] != "dummy"]
+```
+
+Strategy configs never use `kind = "dummy"`.
+
+## Notes
+
+- **One JSON + one parquet per trial**: every run only creates new files with
+  a unique name, so two branches that log trials can always be merged
+  without conflicts, also from the GitHub merge button.
+- **Not SQLite** (the guidelines suggest SQLite for outputs): the log is
+  versioned in git and git cannot merge two versions of a binary file, so
+  one branch's trials would be lost. A local SQLite view can be rebuilt
+  from the files when needed.
+- **Daily PnL, not only summary metrics**: PBO (CSCV), the effective number
+  of trials and the block bootstrap need the full daily series.
+- **Summary metrics are a convenience, not the source of truth**: they are
+  derived from the parquet and never updated after the run. DSR, PBO and the
+  report always recompute metrics from the daily PnL, so a later change in a
+  definition cannot leave stale numbers in the results.
+- **Dirty runs are logged, not rejected**: every attempt counts in $N$.
+  The `dirty` flag marks runs that the commit alone cannot reproduce.
+- **Dummy runs are labelled, not deleted**: the log is append-only, so test
+  runs are marked in their config and filtered out by the analyses. The filter
+  is explicit, so the trials excluded from $N$ are always visible.
+- **Counting $N$**: repeated runs of the same config stay in the log.
+  By default all runs count; the reader can keep only the latest per
+  `config_hash`. The choice used for the DSR is stated in the report.
+- **Size**: about 150 KB per trial (17 years of daily PnL, holdout excluded).
+  Fine for hundreds of trials; revisit the format if the log grows beyond ~1000.
