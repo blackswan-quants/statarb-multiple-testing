@@ -16,7 +16,7 @@ phases/
 
 ## Conventions
 
-- **One folder per week**, one subfolder per workstream. Each subfolder has a `README.md` and, if there is one,
+- **One folder per week**, one subfolder per workstream (never name it `data/`: `.gitignore` drops every `data/` folder). Each subfolder has a `README.md` and, if there is one,
   the presentation of that work.
 - **README**: what was done and why, main results, limits, what is still open. Written for someone reading it for
   the first time, with links to the code and to `docs/` instead of copying details.
