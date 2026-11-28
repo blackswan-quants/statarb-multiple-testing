@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "trial_id": "20261127T135808638469Z_1735a13529ec",
+  "config": {
+    "kind": "dummy",
+    "note": "end-to-end check of the trial logger",
+    "seed": 0
+  },
+  "config_hash": "1735a13529ecfb57a5207851b7d7b986fe3edfae8462b9494872f0623504e0df",
+  "commit": "6d6bc3aeb3600ebe9b2b112a4c3aab9719882ff0",
+  "dirty": false,
+  "timestamp_utc": "2026-11-27T13:58:08.638469Z",
+  "summary": {
+    "n_days": 250,
+    "sharpe_gross": -0.09223033002705269,
+    "sharpe_net": -0.2479770077735923,
+    "max_drawdown_gross": -0.16137407362098066,
+    "max_drawdown_net": -0.17329687446312347
+  }
+}
