@@ -218,3 +218,15 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Build C++ (build/ was already ignored)
+cmake-build-*/
+compile_commands.json
+
+# System and editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Data 
+data/
