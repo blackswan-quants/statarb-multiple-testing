@@ -13,8 +13,8 @@ survivorship bias né look-ahead. Il codice è in [`statarb/`](../../../statarb)
 | 2 | Piano B: S&P 500 storico e titoli usciti mancanti | Fatto, e il buco è stato riempito: copertura 99,97% |
 | 3 | Decisione sui dati per iscritto | Fatto, in `docs/data_choices.md` |
 | 4 | Download di SPY e degli ETF di settore | Fatto, da Tiingo |
-| 5 | Holdout 2023-2025 sigillato (`docs/protocol.md` e tag `holdout-sealed`) | Da fare |
-| 6 | Monte Carlo del massimo di N normali contro la formula di Gumbel | Da fare |
+| 5 | Holdout 2023-2025 sigillato | Fatto: [`docs/protocol.md`](../../../docs/protocol.md), tag `holdout-sealed` |
+| 6 | Monte Carlo del massimo di N normali contro la formula di Gumbel | Fatto: [`notebooks/02_gumbel_check.ipynb`](../../../notebooks/02_gumbel_check.ipynb) |
 
 ## Perché servono dati "onesti"
 
@@ -66,6 +66,27 @@ market cap.
 
 Ogni file grezzo è registrato con data, URL e sha256 in `data/raw/manifest.csv`. Il comando
 `uv run python -m statarb` ricostruisce tutto.
+
+## Holdout sigillato
+
+Il periodo 2023-2025 non si guarda fino alla milestone M4: niente grafici, statistiche o backtest. Lo sviluppo usa
+solo il 2006-2022. Le regole e l'apertura a M4 sono in [`docs/protocol.md`](../../../docs/protocol.md); lo stato
+del repo al momento del sigillo è marcato dal tag git `holdout-sealed`.
+
+## Formula di Gumbel
+
+Il DSR usa come soglia il massimo atteso di N Sharpe ottenuti per caso, approssimato con la formula di Gumbel del
+paper. Su 10 000 simulazioni per ogni N, confrontate anche con il valore esatto:
+
+| N | Simulato | Formula | Errore |
+|---|---|---|---|
+| 10 | 1,539 | 1,575 | +0,036 (2,3%) |
+| 100 | 2,508 | 2,531 | +0,023 (0,9%) |
+| 1000 | 3,241 | 3,255 | +0,014 (0,4%) |
+
+È in linea con il paper: la formula sovrastima poco, e sempre meno al crescere di N. Lo "0,006 a N = 1000" del paper
+è la cella più bassa di una heatmap rumorosa; l'errore vero è 0,014. Sul DSR vale circa 0,01 di Sharpe annuo in più
+nella soglia, quindi un errore piccolo e dalla parte prudente.
 
 ## Limiti
 
