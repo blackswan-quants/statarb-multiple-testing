@@ -7,7 +7,7 @@ roles are in the main presentation: [`main-presentation.pdf`](main-presentation.
 phases/
 ├── main-presentation.pdf      # project brief: papers, proposal, six-week timeline, week 1 tasks
 ├── week-1/                    # F0 · setup and data (23-29 Nov 2026)
-│   ├── data/                  # person A · data and protocol
+│   ├── data-protocol/         # person A · data and protocol
 │   ├── infrastructure/        # person B · repo, C++ build, CI, trial logger
 │   └── model/                 # person C · OU prototype, s-score
 ├── week-2/
