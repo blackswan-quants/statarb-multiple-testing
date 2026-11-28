@@ -1,0 +1,6 @@
+ticker,start,end,action,note
+AGN-201503,2006-01-03,2015-03-20,add,old Allergan; the index file merged it with Watson/Actavis (AGN) when it dropped suffixes
+CB-201601,2006-01-03,2016-01-15,add,old Chubb; merged with ACE (CB) in the index file
+CB,2008-07-18,2010-07-14,remove,ACE out of the index after redomiciling to Switzerland
+JCI-201609,2006-01-03,2016-09-02,add,old Johnson Controls; merged with Tyco (JCI) in the index file
+JCI,2009-03-17,2010-08-26,remove,Tyco out of the index after redomiciling to Switzerland
